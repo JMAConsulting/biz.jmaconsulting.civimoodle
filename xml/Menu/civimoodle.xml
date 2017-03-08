@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/moodle/setting</path>
+    <page_callback>CRM_Civimoodle_Form_Setting</page_callback>
+    <title>Moodle Setting</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+</menu>
