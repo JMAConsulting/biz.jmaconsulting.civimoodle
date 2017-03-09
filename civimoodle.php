@@ -59,6 +59,47 @@ function civimoodle_civicrm_disable() {
 }
 
 /**
+ * Implements hook_civicrm_postProcess().
+ *
+ * @param string $formName
+ * @param CRM_Core_Form $form
+ */
+function civimoodle_civicrm_postProcess($formName, &$form) {
+  $eventIDs = (array) json_decode(Civi::settings()->get('moodle_events'), TRUE);
+  if ($formName == 'CRM_Event_Form_Registration_Confirm' && in_array($form->_eventId, $eventIDs)) {
+    $params = CRM_Utils_Array::value(0, $form->get('params'));
+    $criteria = array(
+      'key' => 'firstname',
+      'value' => $params['first_name'],
+    );
+    list($isError, $response) = CRM_Civimoodle_API::singleton($criteria)->getUser();
+    $response = json_decode($response, TRUE);
+
+    if (!empty($response['users'])) {
+      // update user by calling core_user_update_users
+      $updateParams = array(
+        'id' => $response['users'][0]['id'],
+        'firstname' => $params['first_name'],
+        'lastname' => $params['last_name'],
+        'email' => $params['email-Primary'],
+      );
+      list($isError, $response) = CRM_Civimoodle_API::singleton($updateParams, TRUE)->updateUser();
+    }
+    else {
+      // create user by calling core_user_create_users
+      $createParams = array(
+        'username' => 'dummy', //for now we are using 'dummy' username/password to test this web service
+        'password' => 'Dummy*123',
+        'firstname' => $params['first_name'],
+        'lastname' => $params['last_name'],
+        'email' => $params['email-Primary'],
+      );
+      list($isError, $response) = CRM_Civimoodle_API::singleton($createParams, TRUE)->createUser();
+    }
+  }
+}
+
+/**
  * Implements hook_civicrm_upgrade().
  *
  * @param $op string, the type of operation being performed; 'check' or 'enqueue'

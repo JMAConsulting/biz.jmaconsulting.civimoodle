@@ -82,8 +82,7 @@ class CRM_Civimoodle_Form_Setting extends CRM_Core_Form {
 
   public function postProcess() {
     $values = $this->exportValues();
-
-    Civi::settings()->set('moodle_events', json_encode(CRM_Utils_Array::value('moodle_events', $values)));
+    Civi::settings()->set('moodle_events', json_encode(explode(',', CRM_Utils_Array::value('moodle_events', $values))));
     Civi::settings()->set('moodle_access_token', CRM_Utils_Array::value('moodle_access_token', $values));
     Civi::settings()->set('moodle_domain', CRM_Utils_Array::value('moodle_domain', $values));
 
