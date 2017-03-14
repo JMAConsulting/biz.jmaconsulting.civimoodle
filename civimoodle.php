@@ -65,7 +65,7 @@ function civimoodle_civicrm_disable() {
  * @param CRM_Core_Form $form
  */
 function civimoodle_civicrm_postProcess($formName, &$form) {
-  $eventIDs = (array) json_decode(Civi::settings()->get('moodle_events'), TRUE);
+  /**
   if ($formName == 'CRM_Event_Form_Registration_Confirm' && in_array($form->_eventId, $eventIDs)) {
     $params = CRM_Utils_Array::value(0, $form->get('params'));
     $criteria = array(
@@ -97,7 +97,15 @@ function civimoodle_civicrm_postProcess($formName, &$form) {
       list($isError, $response) = CRM_Civimoodle_API::singleton($createParams, TRUE)->createUser();
     }
   }
+  */
 }
+
+
+function civimoodle_civicrm_post($op, $objectName, $objectId, &$objectRef) {
+  //CRM_Core_Error::debug_var('objectName', $objectName);
+  //CRM_Core_Error::debug_var('or', $objectRef);
+}
+
 
 /**
  * Implements hook_civicrm_upgrade().

@@ -10,13 +10,6 @@ require_once 'CRM/Core/Form.php';
 class CRM_Civimoodle_Form_Setting extends CRM_Core_Form {
 
   /**
-   * CiviCRM Event IDs used for participant enrollment
-   *
-   * @var string
-   */
-  protected $_eventIDs;
-
-  /**
    * Moodle Web Access token
    *
    * @var string
@@ -37,7 +30,6 @@ class CRM_Civimoodle_Form_Setting extends CRM_Core_Form {
     if (!CRM_Core_Permission::check('administer CiviCRM')) {
       CRM_Core_Error::fatal(ts('You do not permission to access this page, please contact your system administrator.'));
     }
-    $this->_eventIDs = json_decode(Civi::settings()->get('moodle_events'), TRUE);
     $this->_accessToken = Civi::settings()->get('moodle_access_token');
     $this->_url = Civi::settings()->get('moodle_domain');
   }
@@ -49,7 +41,6 @@ class CRM_Civimoodle_Form_Setting extends CRM_Core_Form {
    */
   public function setDefaultValues() {
     $defaults = array(
-      'moodle_events' => $this->_eventIDs,
       'moodle_access_token' => $this->_accessToken,
       'moodle_domain' => $this->_url,
     );
@@ -57,17 +48,9 @@ class CRM_Civimoodle_Form_Setting extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
-    $this->addEntityRef('moodle_events', ts('CiviCRM Events'), array(
-        'entity' => 'event',
-        'placeholder' => ts('- any -'),
-        'multiple' => 1,
-        'select' => array('minimumInputLength' => 0),
-      ),
-      TRUE
-    );
     $this->add('password', 'moodle_access_token', ts('Moodle Web-access Token'), array('class' => 'huge'), TRUE);
     $this->add('text', 'moodle_domain', ts('Moodle domain'), array('class' => 'huge'), TRUE);
-    $this->assign('moodleFields', array('moodle_events', 'moodle_access_token', 'moodle_domain'));
+    $this->assign('moodleFields', array('moodle_access_token', 'moodle_domain'));
 
     $this->addButtons(array(
       array(
@@ -82,7 +65,6 @@ class CRM_Civimoodle_Form_Setting extends CRM_Core_Form {
 
   public function postProcess() {
     $values = $this->exportValues();
-    Civi::settings()->set('moodle_events', json_encode(explode(',', CRM_Utils_Array::value('moodle_events', $values))));
     Civi::settings()->set('moodle_access_token', CRM_Utils_Array::value('moodle_access_token', $values));
     Civi::settings()->set('moodle_domain', CRM_Utils_Array::value('moodle_domain', $values));
 

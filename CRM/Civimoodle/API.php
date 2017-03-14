@@ -68,7 +68,7 @@ class CRM_Civimoodle_API {
   /**
    * The constructor sets search parameters and instantiate CRM_Utils_HttpClient
    */
-  public function __construct($searchParams) {
+  public function __construct($searchParams = array()) {
     $this->_searchParams = $searchParams;
     $this->_httpClient = new CRM_Utils_HttpClient();
     $this->_wsToken = Civi::settings()->get('moodle_access_token');
@@ -83,7 +83,7 @@ class CRM_Civimoodle_API {
    *
    * @return CRM_CiviMoodle_API
    */
-  public static function &singleton($searchParams, $reset = FALSE) {
+  public static function &singleton($searchParams = array(), $reset = FALSE) {
     if (self::$_singleton === NULL || $reset) {
       self::$_singleton = new CRM_CiviMoodle_API($searchParams);
     }
@@ -109,6 +109,13 @@ class CRM_Civimoodle_API {
    */
   public function updateUser() {
     return $this->sendRequest('core_user_update_users');
+  }
+
+  /**
+   * Function to core_course_get_courses webservice to create moodle user
+   */
+  public function getCourses() {
+    return $this->sendRequest('core_course_get_courses');
   }
 
   /**

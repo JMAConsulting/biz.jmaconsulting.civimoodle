@@ -2,7 +2,7 @@
 <extension key="biz.jmaconsulting.civimoodle" type="module">
   <downloadUrl>https://github.com/JMAConsulting/biz.jmaconsulting.civimoodle/archive/v1.0.zip</downloadUrl>
   <file>civimoodle</file>
-  <name>CiviCRM Moodle Integration Estension</name>
+  <name>CiviCRM Moodle Integration Extension</name>
   <description></description>
   <license>AGPL-3.0</license>
   <maintainer>
