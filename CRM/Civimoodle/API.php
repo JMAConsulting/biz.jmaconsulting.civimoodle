@@ -119,6 +119,13 @@ class CRM_Civimoodle_API {
   }
 
   /**
+   * Function to enrol_manual_enrol_users webservice to enroll moodle user for given course
+   */
+  public function enrollUser() {
+    return $this->sendRequest('enrol_manual_enrol_users');
+  }
+
+  /**
    * Function used to make Moodle API request
    *
    * @param string $apiFunc
@@ -155,6 +162,11 @@ class CRM_Civimoodle_API {
       }
       break;
 
+      case 'enrol_manual_enrol_users':
+        foreach (array('roleid', 'userid', 'courseid') as $arg) {
+          $searchArgs[] = "enrolments[0][$arg]=" . $this->_searchParams[$arg];
+        }
+        break;
       default:
         //do nothing
         break;

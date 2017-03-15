@@ -59,51 +59,41 @@ function civimoodle_civicrm_disable() {
 }
 
 /**
- * Implements hook_civicrm_postProcess().
+ * Implements hook_civicrm_fieldOptions().
  *
- * @param string $formName
- * @param CRM_Core_Form $form
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_fieldOptions
  */
-function civimoodle_civicrm_postProcess($formName, &$form) {
-  /**
-  if ($formName == 'CRM_Event_Form_Registration_Confirm' && in_array($form->_eventId, $eventIDs)) {
-    $params = CRM_Utils_Array::value(0, $form->get('params'));
-    $criteria = array(
-      'key' => 'firstname',
-      'value' => $params['first_name'],
-    );
-    list($isError, $response) = CRM_Civimoodle_API::singleton($criteria)->getUser();
-    $response = json_decode($response, TRUE);
-
-    if (!empty($response['users'])) {
-      // update user by calling core_user_update_users
-      $updateParams = array(
-        'id' => $response['users'][0]['id'],
-        'firstname' => $params['first_name'],
-        'lastname' => $params['last_name'],
-        'email' => $params['email-Primary'],
-      );
-      list($isError, $response) = CRM_Civimoodle_API::singleton($updateParams, TRUE)->updateUser();
-    }
-    else {
-      // create user by calling core_user_create_users
-      $createParams = array(
-        'username' => 'dummy', //for now we are using 'dummy' username/password to test this web service
-        'password' => 'Dummy*123',
-        'firstname' => $params['first_name'],
-        'lastname' => $params['last_name'],
-        'email' => $params['email-Primary'],
-      );
-      list($isError, $response) = CRM_Civimoodle_API::singleton($createParams, TRUE)->createUser();
+function civimoodle_civicrm_fieldOptions($entity, $field, &$options, $params) {
+  if ($entity == 'Event') {
+    if ($field == CRM_Civimoodle_Util::getCustomFieldKey('courses')) {
+      list($isError, $response) = CRM_Civimoodle_API::singleton()->getCourses();
+      $courses = json_decode($response, TRUE);
+      if (!$isError) {
+        $options = array();
+        foreach ($courses as $course) {
+          $options[$course['id']] = $course['fullname'];
+        }
+      }
     }
   }
-  */
 }
 
-
+/**
+ * Implements hook_civicrm_post().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_post
+ */
 function civimoodle_civicrm_post($op, $objectName, $objectId, &$objectRef) {
-  //CRM_Core_Error::debug_var('objectName', $objectName);
-  //CRM_Core_Error::debug_var('or', $objectRef);
+  if ($objectName == 'Participant') {
+    // fetch courses from given event ID
+    $courses = CRM_Civimoodle_Util::getCoursesFromEvent($objectRef->event_id);
+    if (isset($courses) && count($courses) > 0) {
+      // create/update moodle user based on CiviCRM contact ID information
+      $userID = CRM_Civimoodle_Util::createUser($objectRef->contact_id);
+      // enroll user of given $userID to multiple courses $courses
+      CRM_Civimoodle_Util::enrollUser($courses, $userID);
+    }
+  }
 }
 
 

@@ -26,7 +26,7 @@
  */
 
 /**
- * One place to store frequently used Donor Search variables.
+ * One place to store frequently used CiviMoodle variables.
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016

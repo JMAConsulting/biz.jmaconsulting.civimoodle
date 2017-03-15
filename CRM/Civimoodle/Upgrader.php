@@ -30,7 +30,7 @@ class CRM_Civimoodle_Upgrader extends CRM_Civimoodle_Upgrader_Base {
     $customGroup = civicrm_api3('custom_group', 'create', array(
       'title' => ts('Moodle Credentials', array('domain' => 'biz.jmaconsulting.civimoodle')),
       'name' => 'moodle_credential',
-      'extends' => 'Participant',
+      'extends' => 'Individual',
       'domain_id' => CRM_Core_Config::domainID(),
       'style' => 'Tab',
       'is_active' => 1,
