@@ -69,6 +69,7 @@ class CRM_Civimoodle_Form_Setting extends CRM_Core_Form {
     Civi::settings()->set('moodle_domain', CRM_Utils_Array::value('moodle_domain', $values));
 
     CRM_Core_Session::setStatus(ts("Moodle Settings submitted"), ts('Success'), 'success');
+    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
   }
 
 }

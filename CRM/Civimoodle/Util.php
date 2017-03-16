@@ -39,7 +39,7 @@ class CRM_Civimoodle_Util {
   public static function enrollUser($courses, $userID) {
     foreach ($courses as $courseID) {
       $criteria = array(
-        'roleid' => 5, //hardcoding for now, value for student role ID
+        'roleid' => 5, //hardcoding for now, 5 is the value for student role ID
         'userid' => $userID,
         'courseid' => $courseID,
       );
@@ -119,7 +119,7 @@ class CRM_Civimoodle_Util {
   }
 
   /**
-   * Function get courses IDs from given event ID
+   * Function to fetch courses IDs from given event ID
    *
    * @param int $eventID
    *      CiviCRM Event ID

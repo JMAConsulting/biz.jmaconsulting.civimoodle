@@ -50,6 +50,7 @@ class CRM_Civimoodle_FieldInfo {
           'text_length' => 20,
           'data_type' => 'String',
           'html_type' => 'Text',
+          'weight' => 1,
         ),
         'password' => array(
           'name' => 'password',
@@ -57,6 +58,7 @@ class CRM_Civimoodle_FieldInfo {
           'text_length' => 20,
           'data_type' => 'String',
           'html_type' => 'Text',
+          'weight' => 2,
         ),
         'user_id' => array(
           'name' => 'user_id',
@@ -64,6 +66,7 @@ class CRM_Civimoodle_FieldInfo {
           'data_type' => 'Int',
           'html_type' => 'Text',
           'is_view' => 1,
+          'weight' => 3,
         ),
       );
 

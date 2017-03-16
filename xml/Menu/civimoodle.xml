@@ -3,7 +3,7 @@
   <item>
     <path>civicrm/moodle/setting</path>
     <page_callback>CRM_Civimoodle_Form_Setting</page_callback>
-    <title>Moodle Setting</title>
+    <title>CiviCRM Moodle Integration</title>
     <access_arguments>administer CiviCRM</access_arguments>
   </item>
 </menu>

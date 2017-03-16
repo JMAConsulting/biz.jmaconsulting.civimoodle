@@ -66,9 +66,10 @@ function civimoodle_civicrm_disable() {
 function civimoodle_civicrm_fieldOptions($entity, $field, &$options, $params) {
   if ($entity == 'Event') {
     if ($field == CRM_Civimoodle_Util::getCustomFieldKey('courses')) {
+      // fetch available Moodle courses in array('id' => 'fullname') format
       list($isError, $response) = CRM_Civimoodle_API::singleton()->getCourses();
       $courses = json_decode($response, TRUE);
-      if (!$isError) {
+      if (!$isError && isset($courses) && count($courses)) {
         $options = array();
         foreach ($courses as $course) {
           $options[$course['id']] = $course['fullname'];
@@ -84,7 +85,7 @@ function civimoodle_civicrm_fieldOptions($entity, $field, &$options, $params) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_post
  */
 function civimoodle_civicrm_post($op, $objectName, $objectId, &$objectRef) {
-  if ($objectName == 'Participant') {
+  if ($objectName == 'Participant' && $op == 'create') {
     // fetch courses from given event ID
     $courses = CRM_Civimoodle_Util::getCoursesFromEvent($objectRef->event_id);
     if (isset($courses) && count($courses) > 0) {

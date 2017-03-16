@@ -14,7 +14,7 @@ class CRM_Civimoodle_Upgrader extends CRM_Civimoodle_Upgrader_Base {
    */
   public function install() {
     civicrm_api3('Navigation', 'create', array(
-      'label' => ts('Moodle Settings', array('domain' => 'biz.jmaconsulting.civimoodle')),
+      'label' => ts('CiviCRM Moodle Integration', array('domain' => 'biz.jmaconsulting.civimoodle')),
       'name' => 'moodle_settings',
       'url' => 'civicrm/moodle/setting?reset=1',
       'domain_id' => CRM_Core_Config::domainID(),
