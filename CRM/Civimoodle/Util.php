@@ -113,6 +113,7 @@ class CRM_Civimoodle_Util {
     civicrm_api3('Contact', 'create', array(
       'id' => $contactID,
       $userIDKey => $userID,
+      $passwordKey => '', //clean password if user ID is stored
     ));
 
     return $userID;
@@ -155,4 +156,27 @@ class CRM_Civimoodle_Util {
     return 'custom_' . $customFieldID;
   }
 
+  /**
+   * Function check if moodle credentials is present for a given contact ID
+   *
+   * @param int $contactID
+   *      CiviCRM contact ID
+   *
+   * @return boolean
+   *
+   */
+  public static function moodleCredentialPresent($contactID) {
+    $usernameKey = self::getCustomFieldKey('username');
+    $passwordKey = self::getCustomFieldKey('password');
+    $userIDKey = self::getCustomFieldKey('user_id');
+    $result = civicrm_api3('Contact', 'getsingle', array(
+      'return' => array(
+        $usernameKey,
+        $passwordKey,
+        $userIDKey,
+      ),
+      'id' => $contactID,
+    ));
+    return (empty($result[$userIDKey]) && empty($result[$usernameKey]));
+  }
 }

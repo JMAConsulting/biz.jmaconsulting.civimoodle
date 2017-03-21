@@ -72,7 +72,9 @@ function civimoodle_civicrm_fieldOptions($entity, $field, &$options, $params) {
       if (!$isError && isset($courses) && count($courses)) {
         $options = array();
         foreach ($courses as $course) {
-          $options[$course['id']] = $course['fullname'];
+          if (!empty($course['categoryid'])) {
+            $options[$course['id']] = $course['fullname'];
+          }
         }
       }
     }
@@ -97,6 +99,22 @@ function civimoodle_civicrm_post($op, $objectName, $objectId, &$objectRef) {
   }
 }
 
+/**
+ * Implements hook_civicrm_validateForm().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_validateForm
+ */
+function civimoodle_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
+  if ($formName == 'CRM_Event_Form_Participant') {
+    $courses = CRM_Civimoodle_Util::getCoursesFromEvent($fields['event_id']);
+    if (isset($courses) &&
+      count($courses) > 0 &&
+      CRM_Civimoodle_Util::moodleCredentialPresent($fields['contact_id'])
+    ) {
+      $errors['contact_id'] = ts('Moodle Username or Password not found.');
+    }
+  }
+}
 
 /**
  * Implements hook_civicrm_upgrade().

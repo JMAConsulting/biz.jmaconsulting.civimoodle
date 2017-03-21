@@ -200,7 +200,7 @@ class CRM_Civimoodle_API {
 
     if (!empty($response['exception'])) {
       civicrm_api3('SystemLog', 'create', array(
-        'level' => $response['errorcode'],
+        'level' => 'error',
         'message' => $response['message'],
         'contact_id' => CRM_Core_Session::getLoggedInContactID(),
       ));
