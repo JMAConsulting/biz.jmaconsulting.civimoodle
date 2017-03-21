@@ -53,8 +53,8 @@ class CRM_Civimoodle_Upgrader extends CRM_Civimoodle_Upgrader_Base {
     ));
     civicrm_api3('OptionValue', 'create', array(
       'option_group_id' => $optionGroup['id'],
-      'label' => 'Dummy',
-      'value' => 'dummy',
+      'label' => 'Warning: Moodle Courses not found. Please check your Moodle Integration Settings',
+      'value' => '0',
     ));
 
     // Create custom set 'Available Courses'
