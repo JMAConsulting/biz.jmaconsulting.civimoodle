@@ -150,7 +150,7 @@ class CRM_Civimoodle_Upgrader extends CRM_Civimoodle_Upgrader_Base {
   public static function changeNavigation($action) {
     $names = array('moodle_settings');
     foreach ($names as $name) {
-      if ($name == 'delete') {
+      if ($action == 'delete') {
         $id = civicrm_api3('Navigation', 'getvalue', array(
           'return' => "id",
           'name' => $name,
