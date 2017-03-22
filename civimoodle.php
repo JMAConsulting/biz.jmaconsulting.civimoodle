@@ -109,9 +109,9 @@ function civimoodle_civicrm_validateForm($formName, &$fields, &$files, &$form, &
     $courses = CRM_Civimoodle_Util::getCoursesFromEvent($fields['event_id']);
     if (isset($courses) &&
       count($courses) > 0 &&
-      CRM_Civimoodle_Util::moodleCredentialPresent($fields['contact_id'])
+      CRM_Civimoodle_Util::moodleCredentialPresent($form->_contactId)
     ) {
-      $errors['contact_id'] = ts('Moodle Username or Password not found.');
+      $errors['event_id'] = ts('Moodle Username or Password not found.');
     }
   }
 }
