@@ -94,7 +94,9 @@ function civimoodle_civicrm_post($op, $objectName, $objectId, &$objectRef) {
       // create/update moodle user based on CiviCRM contact ID information
       $userID = CRM_Civimoodle_Util::createUser($objectRef->contact_id);
       // enroll user of given $userID to multiple courses $courses
-      CRM_Civimoodle_Util::enrollUser($courses, $userID);
+      if (!empty($userID)) {
+        CRM_Civimoodle_Util::enrollUser($courses, $userID);
+      }
     }
   }
 }
@@ -105,7 +107,7 @@ function civimoodle_civicrm_post($op, $objectName, $objectId, &$objectRef) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_validateForm
  */
 function civimoodle_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
-  if ($formName == 'CRM_Event_Form_Participant') {
+  if ($formName == 'CRM_Event_Form_Participant' && !($form->_action & CRM_Core_Action::DELETE)) {
     $courses = CRM_Civimoodle_Util::getCoursesFromEvent($fields['event_id']);
     if (isset($courses) &&
       count($courses) > 0 &&
