@@ -67,15 +67,9 @@ function civimoodle_civicrm_fieldOptions($entity, $field, &$options, $params) {
   if ($entity == 'Event') {
     if ($field == CRM_Civimoodle_Util::getCustomFieldKey('courses')) {
       // fetch available Moodle courses in array('id' => 'fullname') format
-      list($isError, $response) = CRM_Civimoodle_API::singleton()->getCourses();
-      $courses = json_decode($response, TRUE);
-      if (!$isError && isset($courses) && count($courses)) {
-        $options = array();
-        foreach ($courses as $course) {
-          if (!empty($course['categoryid'])) {
-            $options[$course['id']] = $course['fullname'];
-          }
-        }
+      $courses = CRM_Civimoodle_Util::getAvailableCourseNames();
+      if (isset($courses) && count($courses)) {
+        $options = $courses;
       }
     }
   }

@@ -154,4 +154,24 @@ class CRM_Civimoodle_Util {
     ));
     return (empty($result[$userIDKey]) && empty($result[$usernameKey]));
   }
+
+  /**
+   * Function to fetch course names in array('id' => 'fullname') format
+   *
+   * @return array $options
+   *       Array of available course names
+   */
+  public static function getAvailableCourseNames() {
+    list($isError, $response) = CRM_Civimoodle_API::singleton()->getCourses();
+    $courses = json_decode($response, TRUE);
+    if (!$isError && isset($courses) && count($courses)) {
+      $options = array();
+      foreach ($courses as $course) {
+        if (!empty($course['categoryid'])) {
+          $options[$course['id']] = $course['fullname'];
+        }
+      }
+    }
+    return $options;
+  }
 }
