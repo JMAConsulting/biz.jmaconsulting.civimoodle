@@ -90,7 +90,9 @@ class CRM_Civimoodle_Util {
       // create user by calling core_user_create_users
       list($isError, $response) = CRM_Civimoodle_API::singleton($userParams, TRUE)->createUser();
       $response = json_decode($response, TRUE);
-      $userID = CRM_Utils_Array::value('id', $response);
+      if (!$isError && !empty($response[0])) {
+        $userID = CRM_Utils_Array::value('id', $response[0]);
+      }
     }
 
     //update user id in contact
