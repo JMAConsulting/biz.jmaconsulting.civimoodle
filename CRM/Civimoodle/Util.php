@@ -50,21 +50,34 @@ class CRM_Civimoodle_Util {
       'firstname' => $result['first_name'],
       'lastname' => $result['last_name'],
       'email' => $result['email'],
+      'username' => $result[$usernameKey],
+      'password' => $result[$passwordKey],
     );
     $userID = CRM_Utils_Array::value($userIDKey, $result);
 
     // If user ID not found, meaning if moodle user is not created or user ID not found in CiviCRM
+    $criterias = array(
+      'username' => $usernameKey,
+      'email' => 'email',
+    );
     if (empty($userID)) {
-      $criteria = array(
-        'key' => 'username',
-        'value' => $result[$usernameKey],
-      );
-      list($isError, $response) = CRM_Civimoodle_API::singleton($criteria)->getUser();
-      $response = json_decode($response, TRUE);
+      // fetch user ID on basis of username OR email
+      foreach ($criterias as $key => $value) {
+        $criteria = array(
+          'key' => $key,
+          'value' => $result[$value],
+        );
+        list($isError, $response) = CRM_Civimoodle_API::singleton($criteria, TRUE)->getUser();
+        $response = json_decode($response, TRUE);
 
-      // if user found on given 'username' value
-      if (!empty($response['users'])) {
-        $userID = $response['users'][0]['id'];
+        // if user found on given 'username' value
+        if (!empty($response['users'])) {
+          $userID = $response['users'][0]['id'];
+        }
+        // break the loop means avoid next criteria search on basis of email if user ID is found
+        if (!empty($userID)) {
+          break;
+        }
       }
     }
 
@@ -75,11 +88,7 @@ class CRM_Civimoodle_Util {
     }
     else {
       // create user by calling core_user_create_users
-      $createParams = array_merge($userParams, array(
-        'username' => $result[$usernameKey],
-        'password' => $result[$passwordKey],
-      ));
-      list($isError, $response) = CRM_Civimoodle_API::singleton($createParams, TRUE)->createUser();
+      list($isError, $response) = CRM_Civimoodle_API::singleton($userParams, TRUE)->createUser();
       $response = json_decode($response, TRUE);
       $userID = CRM_Utils_Array::value('id', $response);
     }
