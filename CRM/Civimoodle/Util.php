@@ -163,7 +163,7 @@ class CRM_Civimoodle_Util {
       ),
       'id' => $contactID,
     ));
-    return (empty($result[$userIDKey]) && empty($result[$usernameKey]));
+    return (empty($result[$userIDKey]) && (empty($result[$usernameKey]) && empty($result[$passwordKey])));
   }
 
   /**
