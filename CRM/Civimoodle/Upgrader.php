@@ -13,19 +13,6 @@ class CRM_Civimoodle_Upgrader extends CRM_Civimoodle_Upgrader_Base {
    *
    */
   public function install() {
-    civicrm_api3('Navigation', 'create', array(
-      'label' => ts('CiviCRM Moodle Integration', array('domain' => 'biz.jmaconsulting.civimoodle')),
-      'name' => 'moodle_settings',
-      'url' => 'civicrm/moodle/setting?reset=1',
-      'domain_id' => CRM_Core_Config::domainID(),
-      'is_active' => 1,
-      'parent_id' => civicrm_api3('Navigation', 'getvalue', array(
-        'return' => "id",
-        'name' => "System Settings",
-      )),
-      'permission' => 'administer CiviCRM',
-    ));
-
     // Create custom set 'Moodle Credentials'
     $customGroup = civicrm_api3('custom_group', 'create', array(
       'title' => ts('Moodle Credentials', array('domain' => 'biz.jmaconsulting.civimoodle')),
@@ -74,8 +61,6 @@ class CRM_Civimoodle_Upgrader extends CRM_Civimoodle_Upgrader_Base {
         'is_searchable' => 1,
       )));
     }
-
-    CRM_Core_BAO_Navigation::resetNavigation();
   }
 
   /**
@@ -83,12 +68,7 @@ class CRM_Civimoodle_Upgrader extends CRM_Civimoodle_Upgrader_Base {
    *
    */
   public function uninstall() {
-    self::changeNavigation('delete');
-
-    $customGroupID = civicrm_api3('custom_group', 'getvalue', array(
-     'name' => 'moodle_courses',
-     'return' => 'id',
-    ));
+    $customGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', 'moodle_courses', 'id', 'name');
     if (!empty($customGroupID)) {
       foreach (CRM_Civimoodle_FieldInfo::getAttributes('moodle_courses') as $param) {
         $customFieldID = civicrm_api3('custom_field', 'getvalue', array(
@@ -103,10 +83,7 @@ class CRM_Civimoodle_Upgrader extends CRM_Civimoodle_Upgrader_Base {
       civicrm_api3('custom_group', 'delete', array('id' => $customGroupID));
     }
 
-    $customGroupID = civicrm_api3('custom_group', 'getvalue', array(
-      'name' => 'moodle_credential',
-      'return' => 'id',
-    ));
+    $customGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', 'moodle_credential', 'id', 'name');
     if (!empty($customGroupID)) {
       foreach (CRM_Civimoodle_FieldInfo::getAttributes('moodle_credential') as $param) {
         $customFieldID = civicrm_api3('custom_field', 'getvalue', array(
@@ -120,9 +97,6 @@ class CRM_Civimoodle_Upgrader extends CRM_Civimoodle_Upgrader_Base {
       }
       civicrm_api3('custom_group', 'delete', array('id' => $customGroupID));
     }
-
-    Civi::settings()->revert('moodle_access_token');
-    Civi::settings()->revert('moodle_domain');
   }
 
   /**
@@ -130,7 +104,6 @@ class CRM_Civimoodle_Upgrader extends CRM_Civimoodle_Upgrader_Base {
    *
    */
   public function enable() {
-    self::changeNavigation('enable');
   }
 
   /**
@@ -138,37 +111,7 @@ class CRM_Civimoodle_Upgrader extends CRM_Civimoodle_Upgrader_Base {
    *
    */
   public function disable() {
-    self::changeNavigation('disable');
   }
 
-  /**
-   * disable/enable/delete Moodle Setting link
-   *
-   * @param string $action
-   * @throws \CiviCRM_API3_Exception
-   */
-  public static function changeNavigation($action) {
-    $names = array('moodle_settings');
-    foreach ($names as $name) {
-      if ($action == 'delete') {
-        $id = civicrm_api3('Navigation', 'getvalue', array(
-          'return' => "id",
-          'name' => $name,
-        ));
-        if ($id) {
-          civicrm_api3('Navigation', 'delete', array('id' => $id));
-        }
-      }
-      else {
-        $isActive = ($action == 'enable') ? 1 : 0;
-        CRM_Core_BAO_Navigation::setIsActive(
-          CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', $name, 'id', 'name'),
-          $isActive
-        );
-      }
-    }
-
-    CRM_Core_BAO_Navigation::resetNavigation();
-  }
 
 }

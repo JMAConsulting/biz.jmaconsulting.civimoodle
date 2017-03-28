@@ -46,8 +46,8 @@ class CRM_Civimoodle_API {
   public function __construct($searchParams = array()) {
     $this->_searchParams = $searchParams;
     $this->_httpClient = new CRM_Utils_HttpClient();
-    $this->_wsToken = Civi::settings()->get('moodle_access_token');
-    $this->_domain = Civi::settings()->get('moodle_domain');
+    $this->_wsToken = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'moodle_access_token');
+    $this->_domain = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'moodle_domain');
   }
 
   /**

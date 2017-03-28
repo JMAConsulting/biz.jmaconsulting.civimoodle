@@ -115,13 +115,12 @@ class CRM_Civimoodle_Util {
    *     Array of moodle course IDs
    */
   public static function getCoursesFromEvent($eventID) {
-    $coursesFieldKey = self::getCustomFieldKey('courses');
-    $result = civicrm_api3('Event', 'getsingle', array(
-      'return' => array($coursesFieldKey),
-      'id' => $eventID,
-    ));
+    $courseFieldName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'courses', 'column_name', 'name');
+    $tableName = CRM_Core_DAO::getFieldValue("CRM_Core_DAO_CustomGroup", 'moodle_courses', 'table_name', 'name');
 
-    return CRM_Utils_Array::value($coursesFieldKey, $result);
+    $courses = CRM_Core_DAO::singleValueQuery(" SELECT $courseFieldName FROM $tableName WHERE entity_id = $eventID ");
+
+    return explode(CRM_Core_DAO::VALUE_SEPARATOR, $courses);
   }
 
   /**

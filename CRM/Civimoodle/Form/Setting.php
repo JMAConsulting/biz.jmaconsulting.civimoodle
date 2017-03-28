@@ -30,8 +30,8 @@ class CRM_Civimoodle_Form_Setting extends CRM_Core_Form {
     if (!CRM_Core_Permission::check('administer CiviCRM')) {
       CRM_Core_Error::fatal(ts('You do not permission to access this page, please contact your system administrator.'));
     }
-    $this->_accessToken = Civi::settings()->get('moodle_access_token');
-    $this->_url = Civi::settings()->get('moodle_domain');
+    $this->_accessToken = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'moodle_access_token');
+    $this->_url = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'moodle_domain');
   }
 
   /**
@@ -65,8 +65,8 @@ class CRM_Civimoodle_Form_Setting extends CRM_Core_Form {
 
   public function postProcess() {
     $values = $this->exportValues();
-    Civi::settings()->set('moodle_access_token', CRM_Utils_Array::value('moodle_access_token', $values));
-    Civi::settings()->set('moodle_domain', CRM_Utils_Array::value('moodle_domain', $values));
+    CRM_Core_BAO_Setting::setItem(CRM_Utils_Array::value('moodle_access_token', $values), CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'moodle_access_token');
+    CRM_Core_BAO_Setting::setItem(CRM_Utils_Array::value('moodle_domain', $values), CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'moodle_domain');
 
     CRM_Core_Session::setStatus(ts("Moodle Settings submitted"), ts('Success'), 'success');
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));

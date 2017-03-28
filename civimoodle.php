@@ -59,18 +59,16 @@ function civimoodle_civicrm_disable() {
 }
 
 /**
- * Implements hook_civicrm_fieldOptions().
+ * Implements hook_civicrm_customFieldOptions().
  *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_fieldOptions
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_customFieldOptions
  */
-function civimoodle_civicrm_fieldOptions($entity, $field, &$options, $params) {
-  if ($entity == 'Event') {
-    if ($field == CRM_Civimoodle_Util::getCustomFieldKey('courses')) {
-      // fetch available Moodle courses in array('id' => 'fullname') format
-      $courses = CRM_Civimoodle_Util::getAvailableCourseNames();
-      if (isset($courses) && count($courses)) {
-        $options = $courses;
-      }
+function civimoodle_civicrm_customFieldOptions($customFieldID, &$options) {
+  if ($customFieldID == CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'courses', 'id', 'name')) {
+    // fetch available Moodle courses in array('id' => 'fullname') format
+    $courses = CRM_Civimoodle_Util::getAvailableCourseNames();
+    if (isset($courses) && count($courses)) {
+      $options = $courses;
     }
   }
 }
@@ -103,9 +101,10 @@ function civimoodle_civicrm_post($op, $objectName, $objectId, &$objectRef) {
 function civimoodle_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
   if ($formName == 'CRM_Event_Form_Participant' && !($form->_action & CRM_Core_Action::DELETE)) {
     $courses = CRM_Civimoodle_Util::getCoursesFromEvent($fields['event_id']);
+    $contactID = (!empty($fields['contact_id'])) ? $fields['contact_id'] : $form->_contactId;
     if (isset($courses) &&
       count($courses) > 0 &&
-      CRM_Civimoodle_Util::moodleCredentialPresent($form->_contactId)
+      CRM_Civimoodle_Util::moodleCredentialPresent($contactID)
     ) {
       $errors['event_id'] = ts('Moodle Username or Password not found.');
     }
@@ -196,14 +195,30 @@ function civimoodle_civicrm_preProcess($formName, &$form) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
  *
+ */
 function civimoodle_civicrm_navigationMenu(&$menu) {
-  _civimoodle_civix_insert_navigation_menu($menu, NULL, array(
-    'label' => ts('The Page', array('domain' => 'biz.jmaconsulting.civimoodle')),
-    'name' => 'the_page',
-    'url' => 'civicrm/the-page',
-    'permission' => 'access CiviReport,access CiviContribute',
-    'operator' => 'OR',
-    'separator' => 0,
-  ));
-  _civimoodle_civix_navigationMenu($menu);
-} // */
+  // get the id of Administer Menu
+  $administerMenuID = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Navigation', 'Administer', 'id', 'name');
+  $systemSettingMenuID = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Navigation', 'System Settings', 'id', 'name');
+
+  // skip adding menu if there is no administer menu
+  if ($administerMenuID) {
+    // get the maximum key under adminster menu
+    if (!empty($menu[$administerMenuID]['child'][$systemSettingMenuID])) {
+      $maxKey = max(array_keys($menu[$administerMenuID]['child'][$systemSettingMenuID]['child']));
+      $menu[$administerMenuID]['child'][$systemSettingMenuID]['child'][$maxKey+1] =  array (
+        'attributes' => array (
+          'label'      => 'CiviCRM Moodle Integration',
+          'name'       => 'moodle_settings',
+          'url'        => 'civicrm/moodle/setting?reset=1',
+          'permission' => 'administer CiviCRM',
+          'operator'   => NULL,
+          'separator'  => TRUE,
+          'parentID'   => $administerMenuID,
+          'navID'      => $maxKey+1,
+          'active'     => 1,
+        )
+      );
+    }
+  }
+}
