@@ -63,12 +63,23 @@ function civimoodle_civicrm_disable() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_customFieldOptions
  */
-function civimoodle_civicrm_customFieldOptions($customFieldID, &$options) {
+function civimoodle_civicrm_customFieldOptions($customFieldID, &$options, $details) {
   if ($customFieldID == CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'courses', 'id', 'name')) {
     // fetch available Moodle courses in array('id' => 'fullname') format
     $courses = CRM_Civimoodle_Util::getAvailableCourseNames();
     if (isset($courses) && count($courses)) {
-      $options = $courses;
+      if ($details) {
+        foreach ($courses as $value => $label) {
+          $options[$value] = array(
+            'id' => $value,
+            'value' => $value,
+            'label' => $label,
+          );
+        }
+      }
+      else {
+        $options = $courses;
+      }
     }
   }
 }
