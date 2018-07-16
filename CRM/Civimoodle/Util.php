@@ -32,9 +32,16 @@ class CRM_Civimoodle_Util {
    *     Moodle user ID
    */
   public static function createUser($contactID) {
+    $userIDKey = self::getCustomFieldKey('user_id');
+
+    if (Civi::settings()->get('moodle_cms_credential')) {
+      return civicrm_api3('Contact', 'getvalue', array(
+        'return' => $userIDKey,
+        'id' => $contactID,
+      ));
+    }
     $usernameKey = self::getCustomFieldKey('username');
     $passwordKey = self::getCustomFieldKey('password');
-    $userIDKey = self::getCustomFieldKey('user_id');
     $result = civicrm_api3('Contact', 'getsingle', array(
       'return' => array(
         'email',

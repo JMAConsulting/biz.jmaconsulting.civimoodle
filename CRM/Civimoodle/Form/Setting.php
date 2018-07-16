@@ -24,6 +24,13 @@ class CRM_Civimoodle_Form_Setting extends CRM_Core_Form {
   protected $_url;
 
   /**
+   * Use CMS account credentials for Moodle user
+   *
+   * @var string
+   */
+  protected $_use_cms_credential;
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
@@ -32,6 +39,7 @@ class CRM_Civimoodle_Form_Setting extends CRM_Core_Form {
     }
     $this->_accessToken = Civi::settings()->get('moodle_access_token');
     $this->_url = Civi::settings()->get('moodle_domain');
+    $this->_use_cms_credential = Civi::settings()->get('moodle_cms_credential');
   }
 
   /**
@@ -43,6 +51,7 @@ class CRM_Civimoodle_Form_Setting extends CRM_Core_Form {
     $defaults = array(
       'moodle_access_token' => $this->_accessToken,
       'moodle_domain' => $this->_url,
+      'moodle_cms_credential' => $this->_use_cms_credential,
     );
     return $defaults;
   }
@@ -50,7 +59,9 @@ class CRM_Civimoodle_Form_Setting extends CRM_Core_Form {
   public function buildQuickForm() {
     $this->add('password', 'moodle_access_token', ts('Moodle Web-access Token'), array('class' => 'huge'), TRUE);
     $this->add('text', 'moodle_domain', ts('Moodle domain'), array('class' => 'huge'), TRUE);
-    $this->assign('moodleFields', array('moodle_access_token', 'moodle_domain'));
+    $this->addYesNo('moodle_cms_credential', ts('Do you want to use CMS account credentials for Moodle?'));
+
+    $this->assign('moodleFields', array('moodle_access_token', 'moodle_domain', 'moodle_cms_credential'));
 
     $this->addButtons(array(
       array(
@@ -65,8 +76,9 @@ class CRM_Civimoodle_Form_Setting extends CRM_Core_Form {
 
   public function postProcess() {
     $values = $this->exportValues();
-    Civi::settings()->set('moodle_access_token', CRM_Utils_Array::value('moodle_access_token', $values));
-    Civi::settings()->set('moodle_domain', CRM_Utils_Array::value('moodle_domain', $values));
+    foreach (['moodle_access_token', 'moodle_domain', 'moodle_cms_credential'] as $attribute) {
+      Civi::settings()->set($attribute, CRM_Utils_Array::value($attribute, $values));
+    }
 
     CRM_Core_Session::setStatus(ts("Moodle Settings submitted"), ts('Success'), 'success');
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
