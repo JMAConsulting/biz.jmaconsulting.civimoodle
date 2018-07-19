@@ -145,7 +145,7 @@ function civimoodle_civicrm_pre($op, $objectName, $objectId, &$params) {
 
     //update user id in contact
     civicrm_api3('Contact', 'create', array(
-      'id' => $contactID,
+      'id' => $params['contact_id'],
       $userIDKey => $userID,
       $passwordKey => '', //clean password if user ID is stored
     ));
