@@ -160,8 +160,8 @@ function _updateDrupalUserDetails($params, $contactParams) {
     'field_first_name',
     'field_last_name',
   ];
-  foreach($user as $attribute => $value) {
-    if (in_array($attribute, $matchingParams) && empty($user[$attribute])) {
+  foreach($userEditParams as $attribute => $value) {
+    if (in_array($attribute, $matchingParams) && empty($user->$attribute)) {
       $paramName = str_replace('field_', '', $attribute);
       $userEditParams[$attribute]['und'][0]['value'] = CRM_Utils_Array::value($paramName, $contactParams, CRM_Utils_Array::value($paramName, $_POST));
     }
