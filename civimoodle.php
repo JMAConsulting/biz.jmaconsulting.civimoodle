@@ -99,18 +99,26 @@ function civimoodle_civicrm_post($op, $objectName, $objectId, &$objectRef) {
           'id' => $objectRef->contact_id,
         ));
 
-        $ufID = civicrm_api3('UFMatch', 'getvalue', [
-          'return' => "uf_id",
-          'contact_id' => $objectRef->contact_id,
-        ]);
+        $ufID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFMatch', $objectRef->contact_id, 'uf_id', 'contact_id');
 
-        $user = _updateDrupalUserDetails($ufID, $result);
+        if (!$ufID) {
+          global $user;
+          civicrm_api3('UFMatch', 'create', array(
+            'contact_id' => $objectRef->contact_id,
+            'uf_id' => $user->uid,
+            'uf_name' => $user->mail,
+            'domain_id' => CRM_Core_BAO_Domain::getDomain(),
+          ));
+          $ufID = $user->uid;
+        }
+
+        $drupaluser = _updateDrupalUserDetails($ufID, $result);
 
         $userParams = array(
           'firstname' => $result['first_name'],
           'lastname' => $result['last_name'],
-          'email' => $user->mail,
-          'username' => $user->name,
+          'email' => $drupaluser->mail,
+          'username' => $drupaluser->name,
           'password' => 'changeme',
         );
         $userID = CRM_Utils_Array::value($userIDKey, $result);
