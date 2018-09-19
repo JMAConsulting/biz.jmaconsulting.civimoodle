@@ -103,24 +103,31 @@ function civimoodle_civicrm_post($op, $objectName, $objectId, &$objectRef) {
 
         if (!$ufID) {
           global $user;
-          civicrm_api3('UFMatch', 'create', array(
-            'contact_id' => $objectRef->contact_id,
-            'uf_id' => $user->uid,
-            'uf_name' => $user->mail,
-            'domain_id' => CRM_Core_BAO_Domain::getDomain(),
-          ));
-          $ufID = $user->uid;
+          if (!empty($user) && !empty($user->uid)) {
+            civicrm_api3('UFMatch', 'create', array(
+              'contact_id' => $objectRef->contact_id,
+              'uf_id' => $user->uid,
+              'uf_name' => $user->mail,
+              'domain_id' => CRM_Core_BAO_Domain::getDomain(),
+            ));
+            $ufID = $user->uid;
+          }
         }
 
-        $drupaluser = _updateDrupalUserDetails($ufID, $result);
-
-        $userParams = array(
+        $userParams = [
           'firstname' => $result['first_name'],
           'lastname' => $result['last_name'],
-          'email' => $drupaluser->mail,
-          'username' => $drupaluser->name,
+          'email' => CRM_Utils_Array::value('email', $result),
+          'username' => $result['first_name'],
           'password' => 'changeme',
-        );
+        ];
+        if ($ufID) {
+          $drupaluser = _updateDrupalUserDetails($ufID, $result);
+          $userParams = array_merge($userParams, [
+            'email' => $drupaluser->mail,
+            'username' => $drupaluser->name,
+          ]);
+        }
         $userID = CRM_Utils_Array::value($userIDKey, $result);
 
         if (!empty($userID)) {
