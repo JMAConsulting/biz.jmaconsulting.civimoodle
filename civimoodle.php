@@ -227,11 +227,14 @@ function _updateDrupalUserDetails($ufID, $contactParams, $create = FALSE) {
     ];
   }
   foreach($userEditParams as $attribute => $value) {
-    if (in_array($attribute, $matchingParams) && (!empty($user->$attribute)) || $create)) {
+    if (in_array($attribute, $matchingParams) && (!empty($user->$attribute) || $create)) {
       $paramName = str_replace('field_', '', $attribute);
       if ($create) {
-        $userEditParams[$attribute]['und'] = ['value'];
-        $userEditParams[$attribute]['und'][0]['value'] = CRM_Utils_Array::value($paramName, $contactParams);
+        $userEditParams[$attribute]['und'] = [
+          0 => [
+            'value' => CRM_Utils_Array::value($paramName, $contactParams),
+          ],
+        ];
       }
       elseif (empty($userEditParams[$attribute]['und'][0]['value'])) {
         $userEditParams[$attribute]['und'][0]['value'] = CRM_Utils_Array::value($paramName, $contactParams);
