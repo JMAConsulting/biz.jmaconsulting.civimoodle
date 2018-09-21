@@ -75,6 +75,27 @@ function civimoodle_civicrm_fieldOptions($entity, $field, &$options, $params) {
   }
 }
 
+function civimoodle_civicrm_buildForm($formName, &$form) {
+  if ($formName == 'CRM_Event_Form_Registration_ThankYou') {
+    if (Civi::settings()->get('moodle_cms_credential') && function_exists('user_load')) {
+      global $user;
+      if (!empty($user->uid)) {
+        $ufID = $user->uid;
+        $contactID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFMatch', $ufID, 'contact_id', 'uf_id');
+        $result = civicrm_api3('Contact', 'getsingle', array(
+          'return' => array(
+            'email',
+            'first_name',
+            'last_name',
+          ),
+          'id' => $contactID,
+        ));
+        _updateDrupalUserDetails($ufID, $result, TRUE);
+      }
+    }
+  }
+}
+
 /**
  * Implements hook_civicrm_post().
  *
@@ -190,7 +211,7 @@ function civimoodle_civicrm_post($op, $objectName, $objectId, &$objectRef) {
   }
 }
 
-function _updateDrupalUserDetails($ufID, $contactParams) {
+function _updateDrupalUserDetails($ufID, $contactParams, $create = FALSE) {
   // fetch user details
   $user = user_load($ufID);
   $userEditParams = (array) $user;
@@ -199,8 +220,12 @@ function _updateDrupalUserDetails($ufID, $contactParams) {
     'field_last_name',
   ];
   foreach($userEditParams as $attribute => $value) {
-    if (in_array($attribute, $matchingParams) && !empty($user->$attribute)) {
+    if ((in_array($attribute, $matchingParams) && !empty($user->$attribute)) || $create) {
       $paramName = str_replace('field_', '', $attribute);
+      if ($create) {
+        $userEditParams[$attribute] = ['und' => ['value']];
+        $userEditParams[$attribute]['und'][0]['value'] = NULL;
+      }
       if (empty($userEditParams[$attribute]['und'][0]['value'])) {
         $userEditParams[$attribute]['und'][0]['value'] = CRM_Utils_Array::value($paramName, $contactParams);
       }
