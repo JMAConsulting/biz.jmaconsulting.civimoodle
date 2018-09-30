@@ -97,6 +97,15 @@ function civimoodle_civicrm_buildForm($formName, &$form) {
           $contactID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFMatch', $ufID, 'contact_id', 'uf_id');
           $userID = CRM_Civimoodle_Util::createUser($contactID, TRUE);
           CRM_Civimoodle_Util::enrollUser($courses, $userID);
+
+          $userIDKey = CRM_Civimoodle_Util::getCustomFieldKey('user_id');
+          //update user id in contact
+          civicrm_api3('Contact', 'create', array(
+            'id' => $contactID,
+            $userIDKey => $userID,
+            $passwordKey => '', //clean password if user ID is stored
+          ));
+
           CRM_Core_BAO_Cache::deleteGroup("moodle courses");
         }
       }
