@@ -27,14 +27,15 @@ class CRM_Civimoodle_Util {
    *
    * @param int $contactID
    *      CiviCRM contact ID
+   * @param bool $ignoreCMSCredential
    *
    * @return int $userID
    *     Moodle user ID
    */
-  public static function createUser($contactID) {
+  public static function createUser($contactID, $ignoreCMSCredential = FALSE) {
     $userIDKey = self::getCustomFieldKey('user_id');
 
-    if (Civi::settings()->get('moodle_cms_credential')) {
+    if (Civi::settings()->get('moodle_cms_credential') && !$ignoreCMSCredential) {
       return civicrm_api3('Contact', 'getvalue', array(
         'return' => $userIDKey,
         'id' => $contactID,

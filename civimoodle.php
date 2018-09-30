@@ -183,12 +183,7 @@ function civimoodle_civicrm_post($op, $objectName, $objectId, &$objectRef) {
           list($isError, $response) = CRM_Civimoodle_API::singleton($updateParams, TRUE)->updateUser();
         }
         else {
-          // create user by calling core_user_create_users
-          list($isError, $response) = CRM_Civimoodle_API::singleton($userParams, TRUE)->createUser();
-          $response = json_decode($response, TRUE);
-          if (!$isError && !empty($response[0])) {
-            $userID = CRM_Utils_Array::value('id', $response[0]);
-          }
+          $userID = CRM_Civimoodle_Util::createUser($objectRef->contact_id, TRUE);
         }
 
         //update user id in contact
