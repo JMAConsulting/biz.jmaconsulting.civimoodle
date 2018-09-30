@@ -91,6 +91,14 @@ function civimoodle_civicrm_buildForm($formName, &$form) {
           'id' => $contactID,
         ));
         _updateDrupalUserDetails($ufID, $result, TRUE);
+
+        $courses = CRM_Core_BAO_Cache::getItem("moodle courses", 'civimoodle_civicrm_post');
+        if (!empty($courses)) {
+          $contactID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFMatch', $ufID, 'contact_id', 'uf_id');
+          $userID = CRM_Civimoodle_Util::createUser($contactID, TRUE);
+          CRM_Civimoodle_Util::enrollUser($courses, $userID);
+          CRM_Core_BAO_Cache::deleteGroup("moodle courses");
+        }
       }
     }
   }
@@ -182,9 +190,6 @@ function civimoodle_civicrm_post($op, $objectName, $objectId, &$objectRef) {
           $updateParams = array_merge($userParams, array('id' => $userID));
           list($isError, $response) = CRM_Civimoodle_API::singleton($updateParams, TRUE)->updateUser();
         }
-        else {
-          $userID = CRM_Civimoodle_Util::createUser($objectRef->contact_id, TRUE);
-        }
 
         //update user id in contact
         civicrm_api3('Contact', 'create', array(
@@ -201,6 +206,10 @@ function civimoodle_civicrm_post($op, $objectName, $objectId, &$objectRef) {
       // enroll user of given $userID to multiple courses $courses
       if (!empty($userID)) {
         CRM_Civimoodle_Util::enrollUser($courses, $userID);
+      }
+      else {
+        CRM_Core_BAO_Cache::deleteGroup("moodle courses");
+        CRM_Core_BAO_Cache::setItem($courses, 'moodle courses', __FUNCTION__);
       }
     }
   }
