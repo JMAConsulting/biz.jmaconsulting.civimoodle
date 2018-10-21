@@ -58,9 +58,16 @@ class CRM_Civimoodle_Util {
       'firstname' => $result['first_name'],
       'lastname' => $result['last_name'],
       'email' => $result['email'],
-      'username' => $result[$usernameKey],
+      'username' => CRM_Utils_Array::value($usernameKey, $result, $result['first_name']),
       'password' => $result[$passwordKey],
     );
+    if (Civi::settings()->get('moodle_cms_credential')) {
+      global $user;
+      if (!empty($user) && !empty($user->uid)) {
+        $userParams['username'] = $user->mail;
+        $userParams['password'] = CRM_Utils_Array::value($passwordKey, $result, 'changeme');
+      }
+    }
     $userID = CRM_Utils_Array::value($userIDKey, $result);
 
     // If user ID not found, meaning if moodle user is not created or user ID not found in CiviCRM
