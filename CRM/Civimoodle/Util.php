@@ -59,13 +59,13 @@ class CRM_Civimoodle_Util {
       'lastname' => $result['last_name'],
       'email' => $result['email'],
       'username' => CRM_Utils_Array::value($usernameKey, $result, $result['first_name']),
-      'password' => $result[$passwordKey],
+      'password' => CRM_Utils_Array::value($passwordKey, $result, 'changeme'),
     );
     if (Civi::settings()->get('moodle_cms_credential')) {
       global $user;
       if (!empty($user) && !empty($user->uid)) {
         $userParams['username'] = $user->mail;
-        $userParams['password'] = CRM_Utils_Array::value($passwordKey, $result, 'changeme');
+        $userParams['password'] = 'changeme';
       }
     }
     $userID = CRM_Utils_Array::value($userIDKey, $result);
