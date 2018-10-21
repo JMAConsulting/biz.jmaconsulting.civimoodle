@@ -64,7 +64,7 @@ class CRM_Civimoodle_Util {
     if (Civi::settings()->get('moodle_cms_credential')) {
       global $user;
       if (!empty($user) && !empty($user->uid)) {
-        $userParams['username'] = empty($user->name) ? $user->name : $user->mail;
+        $userParams['username'] = !empty($user->name) ? $user->name : $user->mail;
         $userParams['password'] = 'changeme';
       }
     }
