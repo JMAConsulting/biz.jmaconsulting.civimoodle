@@ -66,6 +66,9 @@ class CRM_Civimoodle_Util {
       if (!empty($user) && !empty($user->uid)) {
         $userParams['username'] = !empty($user->name) ? $user->name : $user->mail;
         $userParams['password'] = 'changeme';
+        if (empty($result[$usernameKey])) {
+          $result[$usernameKey] = $userParams['username'];
+        }
       }
     }
     $userID = CRM_Utils_Array::value($userIDKey, $result);

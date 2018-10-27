@@ -155,7 +155,7 @@ class CRM_Civimoodle_API {
     list($status, $response) = $this->_httpClient->get($url);
 
     return array(
-      self::recordError($response),
+      self::recordError($response, $url),
       $response,
     );
   }
@@ -165,18 +165,20 @@ class CRM_Civimoodle_API {
    *
    * @param string $response
    *   fetched data from Moodle API
+   * @param string $url
+   *   calling URL
    *
    * @return bool
    *   Found error ? TRUE or FALSE
    */
-  public static function recordError($response) {
+  public static function recordError($response, $url) {
     $isError = FALSE;
     $response = json_decode($response, TRUE);
 
     if (!empty($response['exception'])) {
       civicrm_api3('SystemLog', 'create', array(
         'level' => 'error',
-        'message' => $response['message'],
+        'message' => "URL: {$url} " . $response['message'],
         'contact_id' => CRM_Core_Session::getLoggedInContactID(),
       ));
       $isError = TRUE;
