@@ -79,7 +79,7 @@ function civimoodle_civicrm_buildForm($formName, &$form) {
   if ($formName == 'CRM_Event_Form_Registration_Register') {
     CRM_Core_Resources::singleton()->addScript(
       "CRM.$(function($) {
-        $('#cms_name').sibling('.description').text(\"Username can only contain alphabetical lowercase letters , numbers, hypen '-', underscore '_', period '.', or at-sign '@''\");
+        $('#cms_name').siblings('.description').text(\"Username can only contain alphabetical lowercase letters , numbers, hypen '-', underscore '_', period '.', or at-sign '@''\");
       });"
     );
   }
