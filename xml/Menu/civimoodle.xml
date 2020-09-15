@@ -6,4 +6,9 @@
     <title>CiviCRM Moodle Integration</title>
     <access_arguments>administer CiviCRM</access_arguments>
   </item>
+  <item>
+       <path>civicrm/ajax/cmsuser</path>
+       <page_callback>CRM_Civimoodle_Util::checkUserName</page_callback>
+       <access_callback>1</access_callback>
+  </item>
 </menu>

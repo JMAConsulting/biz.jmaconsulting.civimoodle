@@ -203,4 +203,20 @@ class CRM_Civimoodle_Util {
     }
     return $options;
   }
+
+  /**
+   *  check the CMS username.
+   */
+  public static function checkUserName() {
+    $username = CRM_Utils_Array::value('cms_name', $_REQUEST);
+    if (isset($username) && (strstr($username, ' ') || (strtolower($username) != $username))) {
+      //user name is not valid
+      $errors = ['name' => 'no'];
+      CRM_Utils_JSON::output($errors);
+      CRM_Utils_System::civiExit();
+    }
+    else {
+      CRM_Contact_Page_AJAX::checkUserName();
+    }
+  }
 }
