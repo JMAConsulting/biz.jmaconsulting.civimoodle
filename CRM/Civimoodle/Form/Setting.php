@@ -35,7 +35,7 @@ class CRM_Civimoodle_Form_Setting extends CRM_Core_Form {
    */
   public function preProcess() {
     if (!CRM_Core_Permission::check('administer CiviCRM')) {
-      CRM_Core_Error::fatal(ts('You do not permission to access this page, please contact your system administrator.'));
+      throw new CRM_Core_Exception(ts('You do not permission to access this page, please contact your system administrator.'));
     }
     $this->_accessToken = Civi::settings()->get('moodle_access_token');
     $this->_url = Civi::settings()->get('moodle_domain');
