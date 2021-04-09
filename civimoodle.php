@@ -59,6 +59,21 @@ function civimoodle_civicrm_disable() {
 }
 
 /**
+ * Implements hook_civicrm_container().
+ */
+function civimoodle_civicrm_container(\Symfony\Component\DependencyInjection\ContainerBuilder $container) {
+  $container->setDefinition("cache.civiMoodle", new Symfony\Component\DependencyInjection\Definition(
+    'CRM_Utils_Cache_Interface',
+    [
+      [
+        'name' => 'civi-moodle',
+        'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
+      ],
+    ]
+  ))->setFactory('CRM_Utils_Cache::create')->setPublic(true);
+}
+
+/**
  * Implements hook_civicrm_fieldOptions().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_fieldOptions
@@ -92,7 +107,7 @@ function civimoodle_civicrm_buildForm($formName, &$form) {
         ));
         _updateDrupalUserDetails($ufID, $result, TRUE);
 
-        $courses = CRM_Core_BAO_Cache::getItem("moodle courses", 'civimoodle_civicrm_post');
+        $courses = Civi::cache('civiMoodle')->get('moodle-courses');
         if (!empty($courses)) {
           $contactID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFMatch', $ufID, 'contact_id', 'uf_id');
           $userID = CRM_Civimoodle_Util::createUser($contactID, TRUE);
@@ -106,7 +121,7 @@ function civimoodle_civicrm_buildForm($formName, &$form) {
             $passwordKey => '', //clean password if user ID is stored
           ));
 
-          CRM_Core_BAO_Cache::deleteGroup("moodle courses");
+          Civi::cache('civiMoodle')->delete('moodle-courses');
         }
       }
     }
@@ -217,8 +232,8 @@ function civimoodle_civicrm_post($op, $objectName, $objectId, &$objectRef) {
         CRM_Civimoodle_Util::enrollUser($courses, $userID);
       }
       else {
-        CRM_Core_BAO_Cache::deleteGroup("moodle courses");
-        CRM_Core_BAO_Cache::setItem($courses, 'moodle courses', __FUNCTION__);
+         Civi::cache('civiMoodle')->delete('moodle-courses');
+         Civi::cache('civiMoodle')->set('moodle-courses', $courses);
       }
     }
   }
