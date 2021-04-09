@@ -70,7 +70,7 @@ function civimoodle_civicrm_container(\Symfony\Component\DependencyInjection\Con
         'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
       ],
     ]
-  ))->setFactory('CRM_Utils_Cache::create');
+  ))->setFactory('CRM_Utils_Cache::create')->setPublic(true);
 }
 
 /**
