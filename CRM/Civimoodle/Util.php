@@ -23,6 +23,27 @@ class CRM_Civimoodle_Util {
   }
 
   /**
+   * Function to get loggedin CMS username
+   *
+   * @return string $userName
+   */
+  public static function getCMSUserName() {
+    $config = CRM_Core_Config::singleton();
+    $userName = NULL
+    if ($config->userFramework == 'Drupal') {
+      global $user;
+      if (!empty($user) && !empty($user->uid)) {
+        $userName = !empty($user->name) ? $user->name : $user->mail;
+      }
+    }
+    else {
+      $userName = $config->userSystem->getBestUFUniqueIdentifier();
+    }
+
+    return $userName;
+  }
+
+  /**
    * Function used to create/update moodle user
    *
    * @param int $contactID
@@ -62,13 +83,9 @@ class CRM_Civimoodle_Util {
       'password' => CRM_Utils_Array::value($passwordKey, $result, 'changeme'),
     );
     if (Civi::settings()->get('moodle_cms_credential')) {
-      global $user;
-      if (!empty($user) && !empty($user->uid)) {
-        $userParams['username'] = !empty($user->name) ? $user->name : $user->mail;
+      $userParams['username'] = self::getCMSUserName();
+      if (!empty($userParams['username'])) {
         $userParams['password'] = 'changeme';
-        if (empty($result[$usernameKey])) {
-          $result[$usernameKey] = $userParams['username'];
-        }
       }
     }
     $userID = CRM_Utils_Array::value($userIDKey, $result);
