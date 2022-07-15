@@ -1,7 +1,12 @@
-# biz.jmaconsulting.civimoodle
+# CiviCRM Moodle Integration
 
-This extension integrates CiviCRM and the Moodle online learning system. 
-    Users register and pay for courses in CiviCRM, and the registrations are pushed to Moodle. 
-    Information related to the completion of Moodle units is pulled back to CiviCRM.
-    
-Documentation available at https://github.com/JMAConsulting/biz.jmaconsulting.civimoodle/wiki/CiviMoodle
+We have moved the project space for this extension to CiviCRM's Gitlab.
+This includes both the issue tracking and support, and merge requests.
+
+The new URL is: https://lab.civicrm.org/extensions/civi-moodle 
+
+All issues have been migrated to: https://lab.civicrm.org/extensions/civi-moodle/-/issues 
+
+If you do not already have an account on CiviCRM's Gitlab, you can create an account by registering on https://civicrm.org/user
+
+
